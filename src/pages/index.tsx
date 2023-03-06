@@ -1,7 +1,4 @@
 import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
 
 import {
     GoogleMap,
@@ -11,7 +8,7 @@ import {
     useJsApiLoader,
     MarkerF,
 } from "@react-google-maps/api";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { MAP_API_KEY } from "../constant/env";
 import { useMap } from "../hooks/useMap";
 
@@ -50,11 +47,28 @@ const Home: NextPage = () => {
         });
     };
 
+    const [places, setPlaces] = useState([]);
+    const [searchValue, setSearchValue] = useState("");
+
+    const handleSearch = () => {
+        console.log("test");
+    };
+
     return (
         <div>
             <h1 className="text-3xl font-bold underline text-center">
                 Google Map 口コミ数フィルター
             </h1>
+            <div>
+                検索
+                <input
+                    type="text"
+                    placeholder="a"
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                />
+                <button type="button" onClick={handleSearch}></button>
+            </div>
             <>
                 {isLoaded ? (
                     <GoogleMap
