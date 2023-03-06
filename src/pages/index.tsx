@@ -20,18 +20,35 @@ const containerStyle = {
     width: "100%",
 };
 
+type LatLng = {
+    lat: number;
+    lng: number;
+};
+
 const Home: NextPage = () => {
     const center = {
         lat: 35.69731,
         lng: 139.7747,
     };
+    const [clickedLatLng, setClickedLatLng] = useState<LatLng>(center);
     const markerLabel: google.maps.MarkerLabel = {
-        text: "ミライトデザイン",
+        text: "ここから探します！",
         fontFamily: "sans-serif",
         fontSize: "15px",
         fontWeight: "bold",
     };
     const { isLoaded, onLoad } = useMap({ defaultPosition: center });
+
+    const handleClick = (event: google.maps.MapMouseEvent) => {
+        const clickedLat = event.latLng?.lat();
+        const clickedLng = event.latLng?.lng();
+        console.log(clickedLat);
+        console.log(clickedLng);
+        setClickedLatLng({
+            lat: clickedLat!,
+            lng: clickedLng!,
+        });
+    };
 
     return (
         <div>
@@ -44,9 +61,10 @@ const Home: NextPage = () => {
                         mapContainerStyle={containerStyle}
                         onLoad={onLoad}
                         zoom={20}
-                        center={center}
+                        // center={clickedLatLng}
+                        onClick={handleClick}
                     >
-                        <MarkerF position={center} label={markerLabel} />
+                        <MarkerF position={clickedLatLng} label={markerLabel} />
                     </GoogleMap>
                 ) : (
                     "loading"
