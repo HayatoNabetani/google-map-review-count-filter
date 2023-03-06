@@ -9,6 +9,7 @@ import {
     InfoWindow,
     Marker,
     useJsApiLoader,
+    MarkerF,
 } from "@react-google-maps/api";
 import { useCallback, useState } from "react";
 import { MAP_API_KEY } from "../constant/env";
@@ -19,35 +20,19 @@ const containerStyle = {
     width: "100%",
 };
 
-const center = {
-    lat: 35.69575,
-    lng: 139.77521,
-};
-
-const positionAkiba = {
-    lat: 35.69731,
-    lng: 139.7747,
-};
-
-const positionIwamotocho = {
-    lat: 35.69397,
-    lng: 139.7762,
-};
-
-const divStyle = {
-    background: "white",
-    fontSize: 7.5,
-};
-
 const Home: NextPage = () => {
-    const defaultPosition = {
-        lat: 35.69079374035866,
-        lng: 139.76594718293336,
+    const center = {
+        lat: 35.69731,
+        lng: 139.7747,
     };
+    const markerLabel: google.maps.MarkerLabel = {
+        text: "ミライトデザイン",
+        fontFamily: "sans-serif",
+        fontSize: "15px",
+        fontWeight: "bold",
+    };
+    const { isLoaded, onLoad } = useMap({ defaultPosition: center });
 
-    const { isLoaded, onLoad } = useMap({
-        defaultPosition,
-    });
     return (
         <div>
             <h1 className="text-3xl font-bold underline text-center">
@@ -58,7 +43,11 @@ const Home: NextPage = () => {
                     <GoogleMap
                         mapContainerStyle={containerStyle}
                         onLoad={onLoad}
-                    ></GoogleMap>
+                        zoom={20}
+                        center={center}
+                    >
+                        <MarkerF position={center} label={markerLabel} />
+                    </GoogleMap>
                 ) : (
                     "loading"
                 )}
