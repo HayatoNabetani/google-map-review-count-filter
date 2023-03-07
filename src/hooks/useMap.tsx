@@ -11,8 +11,8 @@ type Props = {
 
 export const useMap = ({ defaultPosition }: Props) => {
     // googleMapsApiKeyは自分で取得したものに差し替えてください
-    const { isLoaded } = useLoadScript({
-        // id: "google-map",
+    const { isLoaded } = useJsApiLoader({
+        id: "google-map",
         googleMapsApiKey: MAP_API_KEY,
         libraries: libraries,
     });
@@ -32,10 +32,11 @@ export const useMap = ({ defaultPosition }: Props) => {
             radius: 5000,
             type: ["restaurant"],
         };
-        service.nearbySearch(request, (results, status) => {
+        service.nearbySearch(request, (results, status, next_page_token) => {
             if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                 // setRestaurants(results);
                 console.log(results);
+                console.log(next_page_token);
             }
         });
     };
