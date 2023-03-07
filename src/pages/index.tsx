@@ -83,32 +83,33 @@ const Home: NextPage = () => {
         });
     };
 
-    const onLoad = useCallback(
-        (map: Map) => {
-            const bounds = new window.google.maps.LatLngBounds(
-                clickedLatLng,
-                clickedLatLng2
-            );
-            // console.log(places);
-            // const bounds = new window.google.maps.LatLngBounds();
-            // places.map((place: any) => {
-            //     const position = {
-            //         lat: place.geometry.location.lat(),
-            //         lng: place.geometry.location.lng(),
-            //     };
-            //     bounds.extend(position);
-            //     return place.id;
-            // });
-            // bounds.extend(clickedLatLng);
-            // 指定した境界がちょうどよく見えるように、地図のビューポート(位置座標とズーム値)を変更してくれます。
-            map.fitBounds(bounds);
-            // const pl = new window.google.maps.places;
-            // console.log(v);
-            setMap(map);
-        },
-        []
-    );
+    const onLoad = useCallback((map: Map) => {
+        const bounds = new window.google.maps.LatLngBounds(
+            clickedLatLng,
+            clickedLatLng2
+        );
+        // 指定した境界がちょうどよく見えるように、地図のビューポート(位置座標とズーム値)を変更してくれます。
+        map.fitBounds(bounds);
+        // const pl = new window.google.maps.places;
+        // console.log(v);
+        setMap(map);
+    }, []);
 
+    useEffect(() => {
+        if (map) {
+            const bounds = new window.google.maps.LatLngBounds();
+            places.map((place: any) => {
+                const position = {
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng(),
+                };
+                bounds.extend(position);
+                return place.id;
+            });
+            bounds.extend(clickedLatLng);
+            map.fitBounds(bounds);
+        }
+    }, [map, places]);
 
     const onUnmount = useCallback((map: Map) => {
         setMap(null);
@@ -161,10 +162,17 @@ const Home: NextPage = () => {
                                 lat: place.geometry.location.lat(),
                                 lng: place.geometry.location.lng(),
                             };
+                            const label: google.maps.MarkerLabel = {
+                                text: place.name,
+                                fontFamily: "sans-serif",
+                                fontSize: "10px",
+                                fontWeight: "bold",
+                            };
                             return (
                                 <MarkerF
                                     key={place.name}
                                     position={position}
+                                    label={label}
                                 />
                             );
                         })}
