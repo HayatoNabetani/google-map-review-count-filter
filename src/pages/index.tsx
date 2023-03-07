@@ -7,7 +7,7 @@ import {
     useJsApiLoader,
     MarkerF,
 } from "@react-google-maps/api";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MAP_API_KEY } from "../constant/env";
 
 const containerStyle = {
@@ -25,6 +25,11 @@ const center = {
     lng: 139.7747,
 };
 
+const positionIwamotocho = {
+    lat: 35.69397,
+    lng: 139.7762,
+};
+
 type Props = {
     defaultPosition: { lat: number; lng: number };
 };
@@ -33,6 +38,8 @@ export type Map = google.maps.Map;
 
 const Home: NextPage = () => {
     const [clickedLatLng, setClickedLatLng] = useState<LatLng>(center);
+    const [clickedLatLng2, setClickedLatLng2] =
+        useState<LatLng>(positionIwamotocho);
     const markerLabel: google.maps.MarkerLabel = {
         text: "ここから探します！",
         fontFamily: "sans-serif",
@@ -50,7 +57,7 @@ const Home: NextPage = () => {
         libraries: libraries,
     });
 
-    const [places, setPlaces] = useState([]);
+    const [places, setPlaces] = useState<any>([]);
     const [searchValue, setSearchValue] = useState("");
 
     const handleSearch = () => {
@@ -69,20 +76,39 @@ const Home: NextPage = () => {
         service.nearbySearch(request, (results, status, next_page_token) => {
             if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                 // setRestaurants(results);
-                console.log(results);
+                // console.log(results);
+                setPlaces(results);
                 console.log(next_page_token);
             }
         });
     };
 
-    const onLoad = useCallback((map: Map) => {
-        const bounds = new window.google.maps.LatLngBounds(clickedLatLng);
-        // 指定した境界がちょうどよく見えるように、地図のビューポート(位置座標とズーム値)を変更してくれます。
-        map.fitBounds(bounds);
-        // const pl = new window.google.maps.places;
-        // console.log(v);
-        setMap(map);
-    }, []);
+    const onLoad = useCallback(
+        (map: Map) => {
+            const bounds = new window.google.maps.LatLngBounds(
+                clickedLatLng,
+                clickedLatLng2
+            );
+            // console.log(places);
+            // const bounds = new window.google.maps.LatLngBounds();
+            // places.map((place: any) => {
+            //     const position = {
+            //         lat: place.geometry.location.lat(),
+            //         lng: place.geometry.location.lng(),
+            //     };
+            //     bounds.extend(position);
+            //     return place.id;
+            // });
+            // bounds.extend(clickedLatLng);
+            // 指定した境界がちょうどよく見えるように、地図のビューポート(位置座標とズーム値)を変更してくれます。
+            map.fitBounds(bounds);
+            // const pl = new window.google.maps.places;
+            // console.log(v);
+            setMap(map);
+        },
+        []
+    );
+
 
     const onUnmount = useCallback((map: Map) => {
         setMap(null);
@@ -126,7 +152,22 @@ const Home: NextPage = () => {
                         // center={clickedLatLng}
                         onClick={handleClick}
                     >
-                        <MarkerF position={clickedLatLng} label={markerLabel} />
+                        <MarkerF
+                            position={clickedLatLng2}
+                            label={markerLabel}
+                        />
+                        {places.map((place: any, i: number) => {
+                            const position = {
+                                lat: place.geometry.location.lat(),
+                                lng: place.geometry.location.lng(),
+                            };
+                            return (
+                                <MarkerF
+                                    key={place.name}
+                                    position={position}
+                                />
+                            );
+                        })}
                     </GoogleMap>
                 ) : (
                     "loading"
