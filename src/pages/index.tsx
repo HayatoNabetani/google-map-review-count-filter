@@ -13,6 +13,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { MAP_API_KEY } from "../constant/env";
 import { MapPinIcon, CalculatorIcon } from "@heroicons/react/24/solid";
 import { Rating } from "react-simple-star-rating";
+import Image from "next/image";
 
 const containerStyle = {
     height: "100vh",
@@ -205,6 +206,7 @@ const Home: NextPage = () => {
             <>
                 <div className="flex flex-col md:flex-row">
                     <div className="flex flex-col h-full p-3 flex-1 md:flex-none md:w-60">
+                        {/* フィルター */}
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <h2>フィルター</h2>
@@ -343,6 +345,51 @@ const Home: NextPage = () => {
                                 </button>
                             </div>
                         </div>
+                        {/* フィルター */}
+                        {/* 結果 */}
+                        <ul role="list" className="divide-y divide-gray-200">
+                            {places.map((place: any, i: number) => {
+                                return (
+                                    <li
+                                        className="py-3 sm:py-4"
+                                        key={place.name}
+                                    >
+                                        <a
+                                            href={`https://www.google.com/maps/search/?api=1&query=${place.vicinity}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="cursor-pointer"
+                                        >
+                                            <div className="flex items-center space-x-4">
+                                                <div className="flex-shrink-0">
+                                                    <Image
+                                                        className="w-8 h-8 rounded-full"
+                                                        src={place.icon}
+                                                        alt="icon"
+                                                        width={5}
+                                                        height={5}
+                                                    />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                                        {place.name}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 truncate">
+                                                        {
+                                                            place.user_ratings_total
+                                                        }
+                                                    </p>
+                                                </div>
+                                                <div className="inline-flex items-center text-base font-semibold text-gray-900">
+                                                    {place.rating}
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        {/* 結果 */}
                     </div>
                     <div className="p-5 flex-auto">
                         {isLoaded ? (
@@ -389,17 +436,6 @@ const Home: NextPage = () => {
                         )}
                     </div>
                 </div>
-                <ul>
-                    {places.map((place: any, i: number) => {
-                        return (
-                            <li key={place.name}>
-                                <p>{place.name}</p>
-                                <p>{place.user_ratings_total}</p>
-                                <p>{place.rating}</p>
-                            </li>
-                        );
-                    })}
-                </ul>
             </>
         </div>
     );
