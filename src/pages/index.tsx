@@ -60,23 +60,33 @@ const Home: NextPage = () => {
     });
 
     const [places, setPlaces] = useState<any>([]);
+
+    // 検索に必要な群
     const [searchValue, setSearchValue] = useState("");
     const [nowPosition, setNowPosition] = useState<any>({});
     const [rating, setRating] = useState(0);
+    const [reviewCount, setReviewCount] = useState(0);
+    const [radius, setRadius] = useState(100);
     const handleRating = (rate: number) => {
         setRating(rate);
     };
-    const onPointerEnter = () => console.log("Enter");
-    const onPointerLeave = () => console.log("Leave");
-    const onPointerMove = (value: number, index: number) =>
-        console.log(value, index);
+    // const onPointerEnter = () => console.log("Enter");
+    // const onPointerLeave = () => console.log("Leave");
+    // const onPointerMove = (value: number, index: number) =>
+    //     console.log(value, index);
 
     const handleSearch = () => {
-        console.log("test");
+        console.log("==検索==");
+        console.log(nowPosition);
+        console.log(searchValue);
+        console.log(rating);
+        console.log(reviewCount);
+        console.log(radius);
+        console.log("==検索==");
         const service = new window.google.maps.places.PlacesService(map!);
         const request: any = {
             location: nowPosition,
-            radius: 1000,
+            radius: radius,
             // type: ["restaurant"],
             keyword: searchValue,
         };
@@ -84,7 +94,18 @@ const Home: NextPage = () => {
             if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                 // setRestaurants(results);
                 // console.log(results);
-                setPlaces(results);
+                const filterResult = results?.filter((result: any) => {
+                    return (
+                        result.rating >= rating &&
+                        result.user_ratings_total >= reviewCount
+                    );
+                });
+
+                if (filterResult?.length) {
+                    setPlaces(filterResult);
+                } else {
+                    alert("検索条件を緩めてください！");
+                }
                 console.log(next_page_token);
             }
         });
@@ -237,7 +258,7 @@ const Home: NextPage = () => {
                                     htmlFor="rounded"
                                     className="block mb-2 text-sm font-medium"
                                 >
-                                    半径(km以内)
+                                    半径({radius}m以内)
                                 </label>
                                 <input
                                     id="rounded"
@@ -245,6 +266,9 @@ const Home: NextPage = () => {
                                     min="0"
                                     max="100"
                                     step="5"
+                                    onChange={(e) =>
+                                        setRadius(Number(e.target.value))
+                                    }
                                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                                 />
                             </div>
@@ -257,9 +281,9 @@ const Home: NextPage = () => {
                                     }}
                                     transition
                                     onClick={handleRating}
-                                    onPointerEnter={onPointerEnter}
-                                    onPointerLeave={onPointerLeave}
-                                    onPointerMove={onPointerMove}
+                                    // onPointerEnter={onPointerEnter}
+                                    // onPointerLeave={onPointerLeave}
+                                    // onPointerMove={onPointerMove}
                                 />
                             </div>
                             <div className="relative">
@@ -275,6 +299,9 @@ const Home: NextPage = () => {
                                     id="reviews"
                                     type="number"
                                     placeholder="レビュー数"
+                                    onChange={(e) =>
+                                        setReviewCount(Number(e.target.value))
+                                    }
                                     step="5"
                                     className="w-full py-2 pl-10 text-sm rounded-md focus:outline-none border"
                                 />
@@ -327,6 +354,17 @@ const Home: NextPage = () => {
                         )}
                     </div>
                 </div>
+                <ul>
+                    {places.map((place: any, i: number) => {
+                        return (
+                            <li>
+                                <p>{place.name}</p>
+                                <p>{place.user_ratings_total}</p>
+                                <p>{place.rating}</p>
+                            </li>
+                        );
+                    })}
+                </ul>
             </>
         </div>
     );
