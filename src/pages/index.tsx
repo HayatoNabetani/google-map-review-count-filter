@@ -6,6 +6,8 @@ import {
     Marker,
     useJsApiLoader,
     MarkerF,
+    CircleF,
+    Circle,
 } from "@react-google-maps/api";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MAP_API_KEY } from "../constant/env";
@@ -38,6 +40,10 @@ type Props = {
 
 export type Map = google.maps.Map;
 
+const MIN_RADIUS = "100";
+const MAX_RADIUS = "5000";
+const STEP = "100";
+
 const Home: NextPage = () => {
     const [clickedLatLng, setClickedLatLng] = useState<LatLng>(center);
     const [clickedLatLng2, setClickedLatLng2] =
@@ -47,6 +53,19 @@ const Home: NextPage = () => {
         fontFamily: "sans-serif",
         fontSize: "15px",
         fontWeight: "bold",
+    };
+
+    const circleOptions: google.maps.CircleOptions = {
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+        clickable: false,
+        draggable: false,
+        editable: false,
+        visible: true,
+        zIndex: 1,
     };
 
     const [map, setMap] = useState<Map | null>(null);
@@ -125,6 +144,7 @@ const Home: NextPage = () => {
                     );
                     setNowPosition(_nowPosition);
                     map.fitBounds(bounds);
+                    map.setZoom(17);
                     setMap(map);
                 },
                 function (error: any) {
@@ -255,17 +275,17 @@ const Home: NextPage = () => {
                             </div>
                             <div className="relative">
                                 <label
-                                    htmlFor="rounded"
+                                    htmlFor="radius"
                                     className="block mb-2 text-sm font-medium"
                                 >
                                     半径({radius}m以内)
                                 </label>
                                 <input
-                                    id="rounded"
+                                    id="radius"
                                     type="range"
-                                    min="0"
-                                    max="100"
-                                    step="5"
+                                    min={MIN_RADIUS}
+                                    max={MAX_RADIUS}
+                                    step={STEP}
                                     onChange={(e) =>
                                         setRadius(Number(e.target.value))
                                     }
@@ -321,13 +341,20 @@ const Home: NextPage = () => {
                             <GoogleMap
                                 mapContainerStyle={containerStyle}
                                 onLoad={onLoad}
-                                zoom={17}
-                                // center={clickedLatLng}
+                                // zoom={17}
+                                center={nowPosition}
                                 onClick={handleClick}
                             >
+                                {/* 現在地のピン */}
                                 <MarkerF
                                     position={nowPosition}
                                     label={markerLabel}
+                                />
+                                {/* 現在地からの半径 */}
+                                <CircleF
+                                    center={nowPosition}
+                                    radius={radius}
+                                    options={circleOptions}
                                 />
                                 {places.map((place: any, i: number) => {
                                     const position = {
