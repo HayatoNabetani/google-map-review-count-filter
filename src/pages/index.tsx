@@ -43,6 +43,10 @@ export type Map = google.maps.Map;
 const MIN_RADIUS = "100";
 const MAX_RADIUS = "5000";
 const STEP = "100";
+const ZOOM = 15;
+const FIRST_REVIEW = 4;
+const REVIEW_COUNT = 100;
+const FIRST_RADIUS = 1000;
 
 const Home: NextPage = () => {
     const [clickedLatLng, setClickedLatLng] = useState<LatLng>(center);
@@ -83,9 +87,9 @@ const Home: NextPage = () => {
     // 検索に必要な群
     const [searchValue, setSearchValue] = useState("");
     const [nowPosition, setNowPosition] = useState<any>({});
-    const [rating, setRating] = useState(0);
-    const [reviewCount, setReviewCount] = useState(0);
-    const [radius, setRadius] = useState(100);
+    const [rating, setRating] = useState(FIRST_REVIEW);
+    const [reviewCount, setReviewCount] = useState(REVIEW_COUNT);
+    const [radius, setRadius] = useState(FIRST_RADIUS);
     const handleRating = (rate: number) => {
         setRating(rate);
     };
@@ -144,7 +148,7 @@ const Home: NextPage = () => {
                     );
                     setNowPosition(_nowPosition);
                     map.fitBounds(bounds);
-                    map.setZoom(17);
+                    map.setZoom(ZOOM);
                     setMap(map);
                 },
                 function (error: any) {
@@ -159,6 +163,7 @@ const Home: NextPage = () => {
         } else {
             setMap(map);
         }
+        setMap(map);
     }, []);
 
     useEffect(() => {
@@ -194,12 +199,12 @@ const Home: NextPage = () => {
 
     return (
         <div>
-            <h1 className="text-3xl font-bold underline text-center">
+            <h1 className="text-xl md:text-3xl font-bold underline text-center">
                 Google Map 口コミ数フィルター
             </h1>
             <>
-                <div className="flex">
-                    <div className="flex flex-col h-full p-3 w-60">
+                <div className="flex flex-col md:flex-row">
+                    <div className="flex flex-col h-full p-3 flex-1 md:flex-none md:w-60">
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <h2>フィルター</h2>
@@ -285,6 +290,7 @@ const Home: NextPage = () => {
                                     type="range"
                                     min={MIN_RADIUS}
                                     max={MAX_RADIUS}
+                                    defaultValue={radius}
                                     step={STEP}
                                     onChange={(e) =>
                                         setRadius(Number(e.target.value))
@@ -300,6 +306,7 @@ const Home: NextPage = () => {
                                         display: "-webkit-inline-box",
                                     }}
                                     transition
+                                    initialValue={rating}
                                     onClick={handleRating}
                                     // onPointerEnter={onPointerEnter}
                                     // onPointerLeave={onPointerLeave}
@@ -319,6 +326,7 @@ const Home: NextPage = () => {
                                     id="reviews"
                                     type="number"
                                     placeholder="レビュー数"
+                                    defaultValue={REVIEW_COUNT}
                                     onChange={(e) =>
                                         setReviewCount(Number(e.target.value))
                                     }
@@ -340,9 +348,9 @@ const Home: NextPage = () => {
                         {isLoaded ? (
                             <GoogleMap
                                 mapContainerStyle={containerStyle}
+                                // center={nowPosition}
+                                // zoom={20}
                                 onLoad={onLoad}
-                                // zoom={17}
-                                center={nowPosition}
                                 onClick={handleClick}
                             >
                                 {/* 現在地のピン */}
@@ -384,7 +392,7 @@ const Home: NextPage = () => {
                 <ul>
                     {places.map((place: any, i: number) => {
                         return (
-                            <li>
+                            <li key={place.name}>
                                 <p>{place.name}</p>
                                 <p>{place.user_ratings_total}</p>
                                 <p>{place.rating}</p>
